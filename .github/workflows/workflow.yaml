@@ -91,7 +91,7 @@ jobs:
       - env:
           SHA_NEW: ${{ needs.fetch_bikes_data.outputs.sha_new }}
         run: echo "SHA_NEW"
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
         with:
           ref: $ {{ needs.fetch_bikes_data.outputs.sha_new }}
           fetch-depth: 0
