@@ -226,3 +226,78 @@ jobs:
       - name: Get commit SHA and store it in GITHUB_OUTPUT
         id: sha_new
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  processing_weather_data:
+    needs: processing_bike_data
+    runs-on: ubuntu-latest
+
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
+
+    permissions:
+      contents: write
+    
+    steps:
+      - env:
+          SHA_NEW: ${{ needs.processing_bike_data.outputs.sha_new }}
+        run: echo "SHA_NEW"
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ needs.processing_bike_data.outputs.sha_new }} 
+          fetch-depth: 0
+
+      - name: Install Poetry
+        run: pipx install poetry
+      
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+          cache: poetry
+      
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-root
+          pip install 'dvc[s3]'
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/haris.brulic/mbajk-ml-2.s3
+          dvc remote modify origin --local access_key_id ${{ secrets.ACCESS_KEY_ID }}
+          dvc remote modify origin --local secret_access_key ${{secrets.SECRET_ACCESS_KEY}}
+      
+      - name: DVC pull
+        run: |
+          dvc pull
+      
+      - name: Process bike data
+        run: |
+          poetry run python src/data/processing_weather_data.py
+
+      - name: Commit changes to DVC
+        run: |
+          dvc add data/processed/processed_weather_data.csv
+          dvc push -r origin
+      
+      - name: Commit changes to Git
+        run: |
+          git config --global user.email "haris.brulic@student.um.si"
+          git config --global user.name "haris.brulic"
+          git add .
+          git commit -m "action: processing_weather_data"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
