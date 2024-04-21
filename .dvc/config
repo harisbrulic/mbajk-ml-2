@@ -1,3 +1,7 @@
+[core]
+    remote = mbajk-ml-2
 ['remote "origin"']
     url = s3://dvc
     endpointurl = https://dagshub.com/haris.brulic/mbajk-ml-2.s3
+['remote "mbajk-ml-2"']
+    url = s3://dvc
