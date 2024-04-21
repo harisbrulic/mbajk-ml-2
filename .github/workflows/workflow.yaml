@@ -50,13 +50,13 @@ jobs:
         run: |
           dvc pull -r origin
       
-      - name: Fetch weather data
+      - name: Fetch bikes data
         run: |
           poetry run python src/data/fetch_bikes_data.py
 
       - name: Commit changes to DVC
         run: |
-          dvc add data/raw/weather.csv
+          dvc add data/raw/bike_stations.csv
           dvc push -r origin
       
       - name: Commit changes to GIT
