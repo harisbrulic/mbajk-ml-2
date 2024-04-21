@@ -52,7 +52,7 @@ jobs:
       
       - name: Fetch weather data
         run: |
-          poetry run python src/data/fetch_bikes_data
+          poetry run python src/data/fetch_bikes_data.py
 
       - name: Commit changes to DVC
         run: |
