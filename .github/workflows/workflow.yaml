@@ -48,7 +48,7 @@ jobs:
       
       - name: DVC pull
         run: |
-          dvc pull -r origin
+          dvc pull
       
       - name: Fetch bikes data
         run: |
