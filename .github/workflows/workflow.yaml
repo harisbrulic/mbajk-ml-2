@@ -41,8 +41,6 @@ jobs:
 
       - name: Configure DVC
         run: |
-          dvc remote add -f origin s3://dvc
-          dvc remote modify origin endpointurl https://dagshub.com/haris.brulic/mbajk-ml-2.s3
           dvc remote modify origin --local access_key_id ${{ secrets.ACCESS_KEY_ID }}
           dvc remote modify origin --local secret_access_key ${{secrets.SECRET_ACCESS_KEY}}
       
