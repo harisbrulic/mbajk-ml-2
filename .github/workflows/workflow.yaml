@@ -64,7 +64,7 @@ jobs:
           git config --global user.email "haris.brulic@student.um.si"
           git config --global user.name "haris.brulic"
           git add .
-          git commit -m "action: fetch bikes data"
+          git commit -m "action: fetch_bikes_data"
       
       - name: Push changes
         uses: ad-m/github-push-action@master
