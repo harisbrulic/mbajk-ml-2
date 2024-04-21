@@ -33,6 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           poetry install --no-interaction --no-root
+          pip install 'dvc[s3]'
 
       - name: Install DVC
         run: |
