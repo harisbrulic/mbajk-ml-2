@@ -78,6 +78,7 @@ jobs:
         run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
   
   fetch_weather_data:
+    needs: fetch_bikes_data
     runs-on: ubuntu-latest
 
     outputs:
@@ -87,15 +88,18 @@ jobs:
       contents: write
     
     steps:
-      - name: Checkout repository
+      - env:
+          SHA_NEW: ${{ needs.fetch_bikes_data.outputs.sha_new }}
+        run: echo "SHA_NEW"
         uses: actions/checkout@v3
         with:
+          ref: $ {{ needs.fetch_bikes_data.outputs.sha_new }}
           fetch-depth: 0
 
       - name: Install Poetry
         run: pipx install poetry
       
-      - name: Setup Python
+      - name: Setup Python Test WORKING
         uses: actions/setup-python@v3
         with:
           python-version: '3.12'
