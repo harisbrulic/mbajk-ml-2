@@ -93,7 +93,7 @@ jobs:
         run: echo "SHA_NEW"
       - uses: actions/checkout@v3
         with:
-          ref: $ {{ needs.fetch_bikes_data.outputs.sha_new }}
+          ref: ${{ needs.fetch_bikes_data.outputs.sha_new }} 
           fetch-depth: 0
 
       - name: Install Poetry
