@@ -99,6 +99,12 @@ jobs:
       - name: Install Poetry
         run: pipx install poetry
       
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+          cache: poetry
+      
       - name: Install dependencies
         run: |
           poetry install --no-interaction --no-root
