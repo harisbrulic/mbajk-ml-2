@@ -1,0 +1,76 @@
+name: Pipeline
+
+on:
+  schedule:
+    - cron: '30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  fetch-bikes-data:
+    runs-on: ubuntu-latest
+
+    outputs:
+      sha_new: ${{ steps.sha_new.outputs.SHA_NEW }}
+
+     permissions:
+      contents: write
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Poetry
+        run: pipx install poetry
+      
+      - name: Setup Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: '3.12'
+          cache: poetry
+      
+      - name: Install dependencies
+        run: |
+          poetry install --with dev --no-interaction --no-root
+
+      - name: Install DVC
+        run: |
+          pip install dvc
+          dvc --version
+
+      - name: Configure DVC
+        run: |
+          dvc remote add -f origin s3://dvc
+          dvc remote modify origin endpointurl https://dagshub.com/haris.brulic/mbajk-ml-2.s3
+          dvc remote modify origin --local access_key_id ${{secrets.ACCESS_KEY_ID}}
+          dvc remote modify origin --local secret_access_key ${{secrets.SECRET_ACCESS_KEY}}
+      
+      - name: DVC pull
+        run: |
+          dvc pull -r origin
+      
+      - name: Fetch weather data
+        run: |
+          poetry run poe fetch_weather_data
+      
+      - name: Commit changes to DVC
+        run: |
+          dvc add data/raw/weather.csv
+          dvc push -r origin
+      
+      - name: Commit changes to GIT
+        run: |
+          git config --global user.email "haris.brulic@student.um.si"
+          git config --global user.name "haris.brulic"
+          git add .
+          git commit -m "action: fetch bikes data"
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+
+      - name: Get commit SHA and store it in GITHUB_OUTPUT
+        id: sha_new
+        run: echo "SHA_NEW=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
