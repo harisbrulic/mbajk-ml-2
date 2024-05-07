@@ -1,5 +1,5 @@
 outs:
-- md5: 13c846408870ec035feea47d6db54c1f
-  size: 1737
+- md5: 5dc9ea132ee59b58b19ae2f9c4d74825
+  size: 1736
   hash: md5
   path: bike_stations.csv
