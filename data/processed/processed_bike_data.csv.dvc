@@ -1,5 +1,5 @@
 outs:
-- md5: abafc1a5310467d8f88f6a311c71cf83
-  size: 1941
+- md5: 5c04f20b1faa2e30139cb942cd7a53da
+  size: 1930
   hash: md5
   path: processed_bike_data.csv
